@@ -220,6 +220,10 @@ ZLSwipeableViewDirection ZLDirectionVectorToSwipeableViewDirection(CGVector dire
                     animated:YES];
         }
     }
+    
+    if ([self.delegate respondsToSelector:@selector(swipeableView:didShowSwipingView:)]) {
+        [self.delegate swipeableView:self didShowSwipingView:topSwipeableView];
+    }
 }
 
 #pragma mark - Action
