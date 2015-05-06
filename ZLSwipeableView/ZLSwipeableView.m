@@ -146,8 +146,13 @@ ZLSwipeableViewDirection ZLDirectionVectorToSwipeableViewDirection(CGVector dire
         if (nextView) {
             [self.containerView addSubview:nextView];
             [self.containerView sendSubviewToBack:nextView];
-            nextView.center = self.swipeableViewsCenterInitial;
             [newViews addObject:nextView];
+            
+            //Adding and remove behavior to reduce video layers flickering on swipe
+            [self createAnchorViewForCover:nextView atLocation:nextView.center shouldAttachAnchorViewToPoint:YES];
+            [self.animator removeBehavior:self.anchorViewAttachmentBehavior];
+            [self.animator removeBehavior:self.swipeableViewAttachmentBehavior];
+            nextView.center = self.swipeableViewsCenterInitial;
         }
     }
 
