@@ -476,9 +476,11 @@ ZLSwipeableViewDirection ZLDirectionVectorToSwipeableViewDirection(CGVector dire
               andCollideInRect:(CGRect)collisionRect {
     ZLSwipeableViewDirection direction = ZLDirectionVectorToSwipeableViewDirection(directionVector);
     
-    if ([self.delegate respondsToSelector:@selector(swipeableView:didSwipeView:inDirection:)]) {
-        [self.delegate swipeableView:self didSwipeView:swipeableView inDirection:direction];
-    }
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if ([self.delegate respondsToSelector:@selector(swipeableView:didSwipeView:inDirection:)]) {
+            [self.delegate swipeableView:self didSwipeView:swipeableView inDirection:direction];
+        }
+    });
     
     [self.animator removeBehavior:self.anchorViewAttachmentBehavior];
     
