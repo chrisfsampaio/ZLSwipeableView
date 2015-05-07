@@ -145,6 +145,7 @@ ZLSwipeableViewDirection ZLDirectionVectorToSwipeableViewDirection(CGVector dire
             [self.containerView sendSubviewToBack:nextView];
             [newViews addObject:nextView];
             
+            nextView.layer.anchorPoint = CGPointMake(0.5f, 1.0f);
             nextView.center = [self centerForView:nextView];
             
             //Adding and removing behavior to reduce video layers flickering on swipe
@@ -190,8 +191,11 @@ ZLSwipeableViewDirection ZLDirectionVectorToSwipeableViewDirection(CGVector dire
         cover.userInteractionEnabled = NO;
         CGFloat diff = 0.06f;
         CGFloat offset = diff - (i * (diff / 2));
-        cover.layer.anchorPoint = CGPointMake(0.5f, 1.0f);
-        cover.center = [self centerForView:cover];
+        
+        CGPoint nextCenter = [self centerForView:cover];
+        if (fabsf(nextCenter.y - cover.center.y) > 20) {
+            cover.center = nextCenter;
+        }
         
         CGAffineTransform transform = CGAffineTransformMakeScale(1.0f - offset, 1.0f - offset);
         if (i == 0) {
