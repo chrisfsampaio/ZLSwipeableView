@@ -187,6 +187,7 @@ ZLSwipeableViewDirection ZLDirectionVectorToSwipeableViewDirection(CGVector dire
     }
     
     NSInteger i = 0;
+    CGFloat duration = 0.4f;
     for (UIView *cover in self.containerView.subviews) {
         cover.userInteractionEnabled = NO;
         CGFloat diff = 0.06f;
@@ -201,14 +202,12 @@ ZLSwipeableViewDirection ZLDirectionVectorToSwipeableViewDirection(CGVector dire
         if (i == 0) {
             CGAffineTransform insertTransform = CGAffineTransformMakeScale(0.7f, 0.7f);
             cover.transform = CGAffineTransformTranslate(insertTransform, 0.0f, -20);
-            cover.alpha = 0.0f;
-            [UIView animateWithDuration:0.4f animations:^{
-                cover.alpha = 1.0f;
+            [UIView animateWithDuration:duration animations:^{
                 cover.transform = transform;
                 cover.center = [self centerForView:cover];
             }];
         } else {
-            [UIView animateWithDuration:0.4f animations:^{
+            [UIView animateWithDuration:duration animations:^{
                 cover.transform = transform;
                 cover.center = [self centerForView:cover];
             }];
@@ -223,38 +222,11 @@ ZLSwipeableViewDirection ZLDirectionVectorToSwipeableViewDirection(CGVector dire
         }
     }
     
-    if (self.isRotationEnabled && NO) {
-        // rotation
-        NSUInteger numSwipeableViews = self.containerView.subviews.count;
-        if (numSwipeableViews >= 1) {
-            [self.animator removeBehavior:self.swipeableViewSnapBehavior];
-            UIView *snapView = self.containerView
-            .subviews[numSwipeableViews - 1];
-            self.swipeableViewSnapBehavior = [self
-                                              snapBehaviorThatSnapView:snapView
-                                              toPoint:[self centerForView:snapView]];
-            [self.animator addBehavior:self.swipeableViewSnapBehavior];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (duration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if ([self.delegate respondsToSelector:@selector(swipeableView:didShowSwipingView:)]) {
+            [self.delegate swipeableView:self didShowSwipingView:topSwipeableView];
         }
-        CGPoint rotationCenterOffset = {
-            0, CGRectGetHeight(topSwipeableView.frame) *
-            self.rotationRelativeYOffsetFromCenter};
-        if (numSwipeableViews >= 2) {
-            [self rotateView:self.containerView.subviews[numSwipeableViews - 2]
-                   forDegree:self.rotationDegree
-          atOffsetFromCenter:rotationCenterOffset
-                    animated:YES];
-        }
-        if (numSwipeableViews >= 3) {
-            [self rotateView:self.containerView.subviews[numSwipeableViews - 3]
-                   forDegree:-self.rotationDegree
-          atOffsetFromCenter:rotationCenterOffset
-                    animated:YES];
-        }
-    }
-    
-    if ([self.delegate respondsToSelector:@selector(swipeableView:didShowSwipingView:)]) {
-        [self.delegate swipeableView:self didShowSwipingView:topSwipeableView];
-    }
+    });
 }
 
 #pragma mark - Action
